@@ -1,5 +1,7 @@
 # erlef/setup-beam
 
+Set up your BEAM-based GitHub Actions workflow (Erlang, Elixir, Gleam, ...)
+
 Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/erlef/setup-beam](https://github.com/erlef/setup-beam).
 
 ## Versions

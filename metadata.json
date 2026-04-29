@@ -1,5 +1,6 @@
 {
   "owner": "erlef",
   "name": "setup-beam",
-  "visibility": ""
+  "visibility": "internal",
+  "description": "Set up your BEAM-based GitHub Actions workflow (Erlang, Elixir, Gleam, ...)"
 }
