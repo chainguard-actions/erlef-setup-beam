@@ -1,6 +1,12 @@
 # erlef/setup-beam
 
-Hardened GitHub Action by [Chainguard](https://www.chainguard.dev).
+Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/erlef/setup-beam](https://github.com/erlef/setup-beam).
+
+## Versions
+
+| Version | Tag | Upstream commit |
+|---------|-----|-----------------|
+| v1.24.0 | [`v1.24.0`](https://github.com/chainguard-actions/setup-beam/tree/v1.24.0) | — |
 
 ## Privacy
 
