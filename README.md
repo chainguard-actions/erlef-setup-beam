@@ -8,7 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
-| v1.24.0 | [`v1.24.0`](https://github.com/chainguard-actions/erlef--setup-beam/tree/v1.24.0) | — |
+| v1.24.0 | [`v1.24.0`](https://github.com/chainguard-actions/erlef-setup-beam/tree/v1.24.0) | — |
 
 ## Privacy
 
