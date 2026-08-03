@@ -1,0 +1,41 @@
+{
+  "name": "setup-beam",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "ncc build src/setup-beam.js --no-cache",
+    "format": "prettier src/**/*.js test/**/*.js *.mjs --write",
+    "eslint": "eslint src/**/*.js test/**/*.js *.mjs",
+    "licenses": "yarn licenses generate-disclaimer > 3RD_PARTY_LICENSES",
+    "markdownlint": "markdownlint *.md ./github/**/*.md",
+    "shellcheck": "shellcheck .github/workflows/*.sh",
+    "test": "node --test --test-reporter=spec",
+    "yamllint": "eslint .github/workflows/**.yml .github/*.yml .*.yml *.yml",
+    "clean-dist": "rm -rf ./dist",
+    "lint": "npm run markdownlint && npm run shellcheck && npm run yamllint && npm run eslint",
+    "build-dist": "npm run clean-dist && npm install && npm run build && npm run format && npm run lint"
+  },
+  "dependencies": {
+    "@actions/core": "3.0.0",
+    "@actions/exec": "3.0.0",
+    "@actions/tool-cache": "4.0.0",
+    "csv-parse": "6.2.1",
+    "semver": "7.7.4",
+    "smol-toml": "1.6.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@vercel/ncc": "0.38.4",
+    "eslint": "10.6.0",
+    "eslint-plugin-yml": "3.3.1",
+    "globals": "17.7.0",
+    "markdownlint-cli": "0.48.0",
+    "prettier": "3.9.1",
+    "shellcheck": "4.1.0",
+    "yarn": "1.22.22"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

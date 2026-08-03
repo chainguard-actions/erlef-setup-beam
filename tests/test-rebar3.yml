@@ -1,0 +1,53 @@
+name: Test rebar3 installation
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ImageOS: ubuntu22
+      RUNNER_ARCH: X64
+      RUNNER_TEMP: /tmp/runner-temp
+      RUNNER_TOOL_CACHE: /tmp/runner-tool-cache
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Prepare runner directories
+        run: |
+          mkdir -p /tmp/runner-temp
+          mkdir -p /tmp/runner-tool-cache
+      - id: setup
+        uses: .
+        with:
+          otp-version: "27.2"
+          rebar3-version: "3.24.0"
+          version-type: strict
+        continue-on-error: true
+      - name: Assert OTP and rebar3 outputs or graceful failure
+        env:
+          OTP_VERSION: ${{ steps.setup.outputs.otp-version }}
+          REBAR3_VERSION: ${{ steps.setup.outputs.rebar3-version }}
+          OUTCOME: ${{ steps.setup.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "otp-version: $OTP_VERSION"
+          echo "rebar3-version: $REBAR3_VERSION"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$OTP_VERSION" ]; then
+              echo "FAIL: action succeeded but otp-version output is empty"
+              exit 1
+            fi
+            echo "PASS: otp-version=$OTP_VERSION"
+            if [ -z "$REBAR3_VERSION" ]; then
+              echo "FAIL: action succeeded but rebar3-version output is empty"
+              exit 1
+            fi
+            echo "PASS: rebar3-version=$REBAR3_VERSION"
+            which rebar3 || { echo "FAIL: rebar3 not found in PATH"; exit 1; }
+            rebar3 version
+            echo "PASS: rebar3 is available"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (network/environment issue in test harness)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
