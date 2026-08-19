@@ -55926,6 +55926,23 @@ async function install(toolName, opts) {
 async function installTool(opts) {
   const { toolName, versionSpec, installOpts } = opts
   const platformOpts = installOpts[process.platform] || installOpts.all
+  let cachePath = find(toolName, versionSpec)
+
+  core_debug(`Checking if ${installOpts.tool} is already cached...`)
+  if (cachePath === '') {
+    core_debug("  ... it isn't!")
+    const downloadToolURL = platformOpts.downloadToolURL(versionSpec)
+    const file = await downloadTool(downloadToolURL)
+    const [targetElemType, targetElem] = await platformOpts.extract(file)
+
+    if (targetElemType === 'dir') {
+      cachePath = await cacheDir(targetElem, toolName, versionSpec)
+    } else if (targetElemType === 'file') {
+      cachePath = await cacheFile(file, targetElem, toolName, versionSpec)
+    }
+  } else {
+    core_debug(`  ... it is, at ${cachePath}`)
+  }
 
   // This makes sure we run, e.g. in Windows, the installer in the runner
   // We're not caching the install, just the downloaded tool
@@ -55934,25 +55951,7 @@ async function installTool(opts) {
     '.setup-beam',
     toolName,
   )
-
-  // Skip the shared RUNNER_TOOL_CACHE to avoid race conditions when multiple
-  // parallel test runs try to cache the same tool version simultaneously.
-  // Instead, download and extract directly to RUNNER_TEMP which is isolated
-  // per test run.
-  core_debug(`Installing ${installOpts.tool} directly to ${runnerToolPath}...`)
-  const downloadToolURL = platformOpts.downloadToolURL(versionSpec)
-  const file = await downloadTool(downloadToolURL)
-  const [targetElemType, targetElem] = await platformOpts.extract(file)
-
-  external_node_fs_namespaceObject.mkdirSync(runnerToolPath, { recursive: true })
-  if (targetElemType === 'dir') {
-    // Copy extracted directory contents into runnerToolPath
-    external_node_fs_namespaceObject.cpSync(targetElem, runnerToolPath, { recursive: true })
-  } else if (targetElemType === 'file') {
-    // targetElem is the desired filename; file is the downloaded source
-    const destFile = external_node_path_namespaceObject.join(runnerToolPath, targetElem)
-    external_node_fs_namespaceObject.copyFileSync(file, destFile)
-  }
+  external_node_fs_namespaceObject.cpSync(cachePath, runnerToolPath, { recursive: true })
 
   core_debug('Performing post extract operations...')
   await platformOpts.postExtract(runnerToolPath)

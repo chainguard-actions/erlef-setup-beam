@@ -1,0 +1,41 @@
+name: Test OTP and rebar3 setup
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          otp-version: "26.2"
+          rebar3-version: "3.23"
+      - name: Assert otp-version output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.otp-version }}
+        run: |
+          echo "actual otp-version: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: otp-version output is empty"
+            exit 1
+          fi
+          echo "PASS: otp-version=$ACTUAL"
+      - name: Assert rebar3-version output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.rebar3-version }}
+        run: |
+          echo "actual rebar3-version: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: rebar3-version output is empty"
+            exit 1
+          fi
+          echo "PASS: rebar3-version=$ACTUAL"
+      - name: Verify erl is available
+        run: |
+          erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell
+          echo "PASS: erl is available"
+      - name: Verify rebar3 is available
+        run: |
+          rebar3 version
+          echo "PASS: rebar3 is available"

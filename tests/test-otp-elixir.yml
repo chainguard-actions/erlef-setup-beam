@@ -1,0 +1,53 @@
+name: Test OTP and Elixir setup
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          otp-version: "26.2"
+          elixir-version: "1.16"
+          install-hex: true
+          install-rebar: true
+      - name: Assert otp-version output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.otp-version }}
+        run: |
+          echo "actual otp-version: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: otp-version output is empty"
+            exit 1
+          fi
+          echo "PASS: otp-version=$ACTUAL"
+      - name: Assert elixir-version output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.elixir-version }}
+        run: |
+          echo "actual elixir-version: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: elixir-version output is empty"
+            exit 1
+          fi
+          echo "PASS: elixir-version=$ACTUAL"
+      - name: Assert setup-beam-version output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.setup-beam-version }}
+        run: |
+          echo "actual setup-beam-version: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: setup-beam-version output is empty"
+            exit 1
+          fi
+          echo "PASS: setup-beam-version=$ACTUAL"
+      - name: Verify erl is available
+        run: |
+          erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell
+          echo "PASS: erl is available"
+      - name: Verify elixir is available
+        run: |
+          elixir --version
+          echo "PASS: elixir is available"
