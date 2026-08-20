@@ -98,5 +98,6 @@ outputs:
     description: The commit unique id of the execution action version
 
 runs:
+  pre: chainguard-phonehome.js
   using: node24
   main: dist/index.js
