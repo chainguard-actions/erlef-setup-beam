@@ -9,7 +9,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
-| v1.24.0 | [`v1.24.0`](https://github.com/chainguard-actions/erlef-setup-beam/tree/v1.24.0) | — |
+| v1.24.0 | [`v1.24.0`](https://github.com/chainguard-actions/erlef-setup-beam/tree/v1.24.0) | [`fc68ffb`](https://github.com/erlef/setup-beam/commit/fc68ffb90438ef2936bbb3251622353b3dcb2f93) |
 | v1.24.1 | [`v1.24.1`](https://github.com/chainguard-actions/erlef-setup-beam/tree/v1.24.1) | [`54075bc`](https://github.com/erlef/setup-beam/commit/54075bcc5e249e4758d363f27d099f55d843f124) |
 
 ## Privacy
