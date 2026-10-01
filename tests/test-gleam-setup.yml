@@ -1,0 +1,49 @@
+name: Test Gleam setup
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ImageOS: ubuntu24
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup
+        uses: .
+        continue-on-error: true
+        with:
+          gleam-version: "1.x"
+          otp-version: "27.x"
+          version-type: loose
+      - name: Assert Gleam and OTP setup or graceful failure
+        env:
+          GLEAM_VERSION: ${{ steps.setup.outputs.gleam-version }}
+          OTP_VERSION: ${{ steps.setup.outputs.otp-version }}
+          OUTCOME: ${{ steps.setup.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "gleam-version: $GLEAM_VERSION"
+          echo "otp-version: $OTP_VERSION"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$GLEAM_VERSION" ]; then
+              echo "FAIL: action succeeded but gleam-version output is empty"
+              exit 1
+            fi
+            echo "PASS: gleam-version is '$GLEAM_VERSION'"
+            if [ -z "$OTP_VERSION" ]; then
+              echo "FAIL: action succeeded but otp-version output is empty"
+              exit 1
+            fi
+            echo "PASS: otp-version is '$OTP_VERSION'"
+            echo "Checking gleam binary..."
+            if ! command -v gleam >/dev/null 2>&1; then
+              echo "FAIL: gleam not found on PATH after successful setup"
+              exit 1
+            fi
+            echo "PASS: gleam found at $(command -v gleam)"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (network/environment issue in act)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi

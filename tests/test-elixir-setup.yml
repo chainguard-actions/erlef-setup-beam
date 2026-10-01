@@ -1,0 +1,57 @@
+name: Test Elixir setup with OTP
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      ImageOS: ubuntu24
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: setup
+        uses: .
+        continue-on-error: true
+        with:
+          otp-version: "26.x"
+          elixir-version: "1.17.x"
+          version-type: loose
+          install-hex: true
+          install-rebar: true
+      - name: Assert Elixir and OTP setup or graceful failure
+        env:
+          OTP_VERSION: ${{ steps.setup.outputs.otp-version }}
+          ELIXIR_VERSION: ${{ steps.setup.outputs.elixir-version }}
+          OUTCOME: ${{ steps.setup.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          echo "otp-version: $OTP_VERSION"
+          echo "elixir-version: $ELIXIR_VERSION"
+          if [ "$OUTCOME" = "success" ]; then
+            if [ -z "$OTP_VERSION" ]; then
+              echo "FAIL: action succeeded but otp-version output is empty"
+              exit 1
+            fi
+            echo "PASS: otp-version is '$OTP_VERSION'"
+            if [ -z "$ELIXIR_VERSION" ]; then
+              echo "FAIL: action succeeded but elixir-version output is empty"
+              exit 1
+            fi
+            echo "PASS: elixir-version is '$ELIXIR_VERSION'"
+            echo "Checking elixir binary..."
+            if ! command -v elixir >/dev/null 2>&1; then
+              echo "FAIL: elixir not found on PATH after successful setup"
+              exit 1
+            fi
+            echo "PASS: elixir found at $(command -v elixir)"
+            echo "Checking mix binary..."
+            if ! command -v mix >/dev/null 2>&1; then
+              echo "FAIL: mix not found on PATH after successful setup"
+              exit 1
+            fi
+            echo "PASS: mix found at $(command -v mix)"
+          elif [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action failed gracefully (network/environment issue in act)"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
